@@ -1,0 +1,20 @@
+services:
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./app:/usr/share/nginx/html:ro
+    ports:
+      - "${NGINX_PORT}:${NGINX_PORT}"
+    env_file:
+      - .env
+    environment:
+      - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
+      - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:${NGINX_PORT}/templates/index.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped

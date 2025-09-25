@@ -1,0 +1,38 @@
+server {
+    listen ${NGINX_PORT};
+    listen [::]:${NGINX_PORT};
+    server_name ${NGINX_SERVER_NAME};
+    
+    root /usr/share/nginx/html;
+    index templates/index.html;
+
+    # Redirect root to index.html
+    location = / {
+        return 301 /templates/index.html;
+    }
+
+    # Handle HTML files in templates directory
+    location /templates/ {
+        try_files $uri $uri/ =404;
+        add_header Cache-Control "${TEMPLATES_CACHE_CONTROL}";
+    }
+
+    # Handle static files
+    location /static/ {
+        access_log ${STATIC_ACCESS_LOG};
+        expires ${STATIC_EXPIRES};
+        add_header Cache-Control "${STATIC_CACHE_CONTROL}";
+    }
+
+    # Additional security headers
+    add_header X-Frame-Options "${FRAME_OPTIONS}" always;
+    add_header X-XSS-Protection "${XSS_PROTECTION}" always;
+    add_header X-Content-Type-Options "${CONTENT_TYPE_OPTIONS}" always;
+
+    # Health check endpoint
+    location /health {
+        access_log off;
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+}
