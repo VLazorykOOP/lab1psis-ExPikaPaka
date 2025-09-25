@@ -2,7 +2,6 @@ server {
     listen ${NGINX_PORT};
     listen [::]:${NGINX_PORT};
     server_name ${NGINX_SERVER_NAME};
-    
     root /usr/share/nginx/html;
     index templates/index.html;
 
@@ -17,8 +16,9 @@ server {
         add_header Cache-Control "${TEMPLATES_CACHE_CONTROL}";
     }
 
-    # Handle static files
+    # Handle static files 
     location /static/ {
+        root /usr/share/nginx/html;
         access_log ${STATIC_ACCESS_LOG};
         expires ${STATIC_EXPIRES};
         add_header Cache-Control "${STATIC_CACHE_CONTROL}";
